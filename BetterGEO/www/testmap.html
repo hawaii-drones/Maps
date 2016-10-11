@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Geolocation</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    #floating-panel {
+        position: absolute;
+        top: 10px;
+        left: 25%;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+        text-align: center;
+        font-family: 'Roboto','sans-serif';
+        line-height: 30px;
+        padding-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="js/geolocation.js"></script>
+      
+    <div id="floating-panel">
+        <b>Destination:</b>
+        <select id="end">
+             <option value="kahuku, hi">Kahuku</option>
+            <option value="laie, hi">Laie</option>
+            <option value="21.641679, -157.92584">110</option> <!--College of math and sci -->
+            <option value="21.64136, -157.925874">112</option> 
+            <option value="21.641679, -157.92584">118-123</option>
+            <option value="21.64134, -157.925918">127-133</option>
+            <option value="21.640902, -157.92583">134-140</option>
+            <option value="21.640832, -157.925841">141/146/147</option>
+            <option value="21.640927, -157.925887">144/145</option>
+            <option value="21.640962, -157.924958">152-159</option>
+            <option value="21.641138, -157.925077">160-168</option>
+            <option value="21.641205, -157.924762">170-180</option>
+            <option value="21.641242, -157.925325">180</option>
+        </select>
+    </div>
+    <div id="map"></div>
+    <script>
+      // Note: This example requires that you consent to location sharing when
+      // prompted by your browser. If you see the error "The Geolocation service
+      // failed.", it means you probably did not give permission for the browser to
+      // locate you.
+        var mypos;
+        var theMarker;
+      function initMap() {
+        var directionsService = new google.maps.DirectionsService;
+        var directionsDisplay = new google.maps.DirectionsRenderer;
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 14,
+          center: {lat: 21.5947, lng: -157.8956}
+        });
+        directionsDisplay.setMap(map);
+          //CURENTLOCATION DO NOT TOUCH
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var userMarker = new google.maps.Marker({
+            position: {lat: pos.lat, lng: pos.lng},
+            map: map,
+            icon: 'http://www.robotwoods.com/dev/misc/bluecircle.png'
+            });
+            mypos = pos;
+            theMarker = userMarker;
+            infoWindow.setPosition(pos);
+            infoWindow.setContent('Location found.');
+            map.setCenter(mypos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+          //ENDCURRENT LOCATION
+        //window.alert(mypos.lat);
+        var onChangeHandler = function() {
+          calculateAndDisplayRoute(directionsService, directionsDisplay);
+        };
+          myTimer();
+       // document.getElementById('start').addEventListener('change', onChangeHandler);
+        document.getElementById('end').addEventListener('change', onChangeHandler);
+      }
+
+      function calculateAndDisplayRoute(directionsService, directionsDisplay) {
+         // window.alert(mypos.lat);
+         // window.alert("PROG RAN");
+        directionsService.route({
+          origin: new google.maps.LatLng({lat: mypos.lat, lng: mypos.lng}),
+          destination: document.getElementById('end').value,
+          travelMode: google.maps.TravelMode.WALKING
+        }, function(response, status) {
+          if (status === google.maps.DirectionsStatus.OK) {
+            directionsDisplay.setDirections(response);
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+      }
+        function myTimer(directionsService, directionsDisplay){
+             setInterval(function(directionsService, directionsDisplay){
+            //window.alert("PROG RAN");
+            if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var newpos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            var myLatLng = new google.maps.LatLng(newpos.lat, newpos.lng);
+            theMarker.setPosition(myLatLng);
+            //window.alert(theMarker.getPosition());
+            mypos = newpos;
+            infoWindow.setPosition(newpos);
+            infoWindow.setContent('Location found.');
+            map.setCenter(mypos);
+          }, function() {
+            handleLocationError(true, infoWindow, map.getCenter());
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow, map.getCenter());
+        }
+                // calculateAndDisplayRoute(directionsService, directionsDisplay);
+        }, 1000);
+        }
+       
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAekxE91tSYNb34RZzvwXayDSLHofNkzEI&callback=initMap">
+    </script>
+  </body>
+</html>
+
