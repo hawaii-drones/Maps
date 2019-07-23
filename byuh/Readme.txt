@@ -13,3 +13,5 @@ Here i will just note the main problems of the interface and anyone who wants ca
 
 also i have noted that sometimes the intel XDK does not show some of the features unless you run
 your program in full or in debugging mode. 
+
+Request Git License
